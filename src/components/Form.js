@@ -13,6 +13,9 @@ export const Form = () => {
         .addNote(value.trim())
         .then(() => {
           alert.show("Заметка была создана!", "success");
+          setTimeout(() => {
+            alert.hide();
+          }, 2000);
         })
         .catch(() => {
           alert.show("Что-то пошло не так!", "danger");
@@ -24,17 +27,17 @@ export const Form = () => {
   };
   return (
     <div>
-        <form onSubmit={submitHandler}>
-      <div className="form-group">
-        <input
-          className="form-control"
-          type="text"
-          placeholder="Введите название заметки"
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-        />
-      </div>
-    </form>
+      <form onSubmit={submitHandler}>
+        <div className="form-group">
+          <input
+            className="form-control"
+            type="text"
+            placeholder="Введите название заметки"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+          />
+        </div>
+      </form>
     </div>
   );
 };

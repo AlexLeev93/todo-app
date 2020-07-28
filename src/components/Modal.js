@@ -1,41 +1,55 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { customHistory } from "../App";
-import qs from 'qs';
+import qs from "qs";
+import { FirebaseContext } from "../context/firebase/firebaseContext";
+import { AlertContext } from "../context/alert/alertContext";
 
-export default () => {
+const CustomModal = (note) => {
   const [isShow, setShow] = useState();
-  useEffect(()=>{
-    if(qs.parse(customHistory.location.search.replace("?","")).modal){
-      setShow(true)
-    }else{
-      setShow(false)
+  const alert = useContext(AlertContext);
+  const { removeNote } = useContext(FirebaseContext);
+  useEffect(() => {
+    if (qs.parse(customHistory.location.search.replace("?", "")).modal) {
+      setShow(true);
+    } else {
+      setShow(false);
     }
-  },[customHistory.location.search])
-  const hide = ()=>{
-    customHistory.push(customHistory.location.pathname)
-  }
-  const show = ()=>{
-    setShow(true);
-  }
-  
-  console.log(customHistory)
+  }, [customHistory.location.search]);
+  const hide = () => {
+    customHistory.push(customHistory.location.pathname);
+  };
+  const onRemove = (note) => {
+    customHistory.push(customHistory.location.pathname);
+    removeNote(note.id)
+      .then(() => {
+        alert.show("Заметка была удалена!", "warning");
+        setTimeout(() => {
+          alert.hide();
+        }, 2000);
+      })
+      .catch(() => {
+        alert.show("Что-то пошло не так!", "danger");
+      });
+  };
   return (
     <div>
       <Modal show={isShow} onHide={hide}>
         <Modal.Header closeButton>
-          <Modal.Title>Modal heading</Modal.Title>
+          <Modal.Title>Удалить заметку</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
+        <Modal.Body>Вы уверены, что хотите удалить заметку?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={hide}>
-            Close
+            Отмена
           </Button>
-          <Button variant="primary" onClick={hide}>
-            Save Changes
+          <Button variant="primary" onClick={() => onRemove(note)}>
+            Удалить
           </Button>
         </Modal.Footer>
       </Modal>
     </div>
   );
 };
+
+export default CustomModal;
